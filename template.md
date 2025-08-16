@@ -1,55 +1,17 @@
-# Shadcn Dashboard
+Shadcn Dashboard prompt
 
-A fully responsive analytics dashboard featuring dynamic charts, interactive tables, a collapsible sidebar, and a light/dark mode theme switcher. Built with modern web technologies, it ensures seamless performance across devices, offering an intuitive user interface for data visualization and exploration.
-
-## Features
-
-- 🌓 **Dark/Light Mode Toggle** - Seamless theme switching with system preference support
-- 🎨 **Multiple Theme Options** - Choose from Default, Blue, Green, Amber, and Mono themes
-- 📱 **Fully Responsive** - Optimized for desktop, tablet, and mobile devices
-- 📊 **Dynamic Charts** - Interactive data visualization components
-- 📋 **Interactive Tables** - Sortable and filterable data tables
-- 🎛️ **Collapsible Sidebar** - Space-efficient navigation
-- ⚡ **Modern Stack** - Built with Next.js 15, TypeScript, and Tailwind CSS
-
-## Tech Stack
-
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Shadcn/ui
-- **Icons**: Lucide React
-- **Theme Management**: next-themes
-
-## Quick Start
-
-### 1. Create Next.js Project
-
-```bash
+```visual-basic
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --yes
-```
 
-### 2. Install Shadcn Dashboard
-
-```bash
 npx shadcn@latest add dashboard-01
-```
 
-### 3. Install Theme Dependencies
-
-```bash
 npm install next-themes
 ```
 
-## Setup Guide
-
-### Theme Provider Setup
-
-1. **Create Theme Provider Component**
-
-Create `components/theme-provider.tsx`:
+Dark/Light Mode Toggle:
 
 ```tsx
+//components/theme-provider.tsx
 'use client'
 
 import * as React from 'react'
@@ -60,11 +22,28 @@ export function ThemeProvider({ children, ...props }: React.ComponentProps<typeo
 }
 ```
 
-2. **Create Mode Toggle Component**
+```tsx
+//app/layout.tsx
+import { ThemeProvider } from '@/components/theme-provider'
 
-Create `components/ui/mode-toggle.tsx`:
+export default function RootLayout({ children }: RootLayoutProps) {
+  return (
+    <>
+      <html lang='en' suppressHydrationWarning>
+        <head />
+        <body>
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    </>
+  )
+}
+```
 
 ```tsx
+//components/ui/mode-toggle.tsx
 'use client'
 
 import * as React from 'react'
@@ -96,13 +75,123 @@ export function ModeToggle() {
 }
 ```
 
-### Advanced Theme Configuration
+- put <modeToggle/> in components/site-header.tsx (replace github Button)
 
-1. **Create Active Theme Provider**
+Add Theme Selector:
 
-Create `components/active-theme.tsx`:
+- [https://github.com/shadcn-ui/ui/blob/main/apps/v4/app/(examples)/dashboard/components/theme-selector.tsx](<https://github.com/shadcn-ui/ui/blob/main/apps/v4/app/(examples)/dashboard/components/theme-selector.tsx>)
 
 ```tsx
+/[/components/theme-selector.tsx](https://github.com/shadcn-ui/ui/blob/main/apps/v4/app/(examples)/dashboard/components/theme-selector.tsx)
+"use client"
+
+import { useThemeConfig } from "./active-theme"
+import { Label } from "@/components/ui/label"
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectSeparator,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
+const DEFAULT_THEMES = [
+    {
+        name: "Default",
+        value: "default",
+    },
+    {
+        name: "Blue",
+        value: "blue",
+    },
+    {
+        name: "Green",
+        value: "green",
+    },
+    {
+        name: "Amber",
+        value: "amber",
+    },
+]
+
+const SCALED_THEMES = [
+    {
+        name: "Default",
+        value: "default-scaled",
+    },
+    {
+        name: "Blue",
+        value: "blue-scaled",
+    },
+]
+
+const MONO_THEMES = [
+    {
+        name: "Mono",
+        value: "mono-scaled",
+    },
+]
+
+export function ThemeSelector() {
+    const { activeTheme, setActiveTheme } = useThemeConfig()
+
+    return (
+        <div className="flex items-center gap-2">
+            <Label htmlFor="theme-selector" className="sr-only">
+                Theme
+            </Label>
+            <Select value={activeTheme} onValueChange={setActiveTheme}>
+                <SelectTrigger
+                    id="theme-selector"
+                    size="sm"
+                    className="justify-start *:data-[slot=select-value]:w-12"
+                >
+                    <span className="text-muted-foreground hidden sm:block">
+                        Select a theme:
+                    </span>
+                    <span className="text-muted-foreground block sm:hidden">Theme</span>
+                    <SelectValue placeholder="Select a theme" />
+                </SelectTrigger>
+                <SelectContent align="end">
+                    <SelectGroup>
+                        <SelectLabel>Default</SelectLabel>
+                        {DEFAULT_THEMES.map((theme) => (
+                            <SelectItem key={theme.name} value={theme.value}>
+                                {theme.name}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                    <SelectSeparator />
+                    <SelectGroup>
+                        <SelectLabel>Scaled</SelectLabel>
+                        {SCALED_THEMES.map((theme) => (
+                            <SelectItem key={theme.name} value={theme.value}>
+                                {theme.name}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                        <SelectLabel>Monospaced</SelectLabel>
+                        {MONO_THEMES.map((theme) => (
+                            <SelectItem key={theme.name} value={theme.value}>
+                                {theme.name}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+        </div>
+    )
+}
+```
+
+- https://github.com/shadcn-ui/ui/blob/main/apps/v4/components/active-theme.tsx#L50
+
+```tsx
+//components/active-theme.tsx
 'use client'
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
@@ -143,94 +232,11 @@ export function useThemeConfig() {
 }
 ```
 
-2. **Create Theme Selector Component**
-
-Create `components/theme-selector.tsx`:
-
-```tsx
-'use client'
-
-import { useThemeConfig } from './active-theme'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
-const DEFAULT_THEMES = [
-  { name: 'Default', value: 'default' },
-  { name: 'Blue', value: 'blue' },
-  { name: 'Green', value: 'green' },
-  { name: 'Amber', value: 'amber' },
-]
-
-const SCALED_THEMES = [
-  { name: 'Default', value: 'default-scaled' },
-  { name: 'Blue', value: 'blue-scaled' },
-]
-
-const MONO_THEMES = [{ name: 'Mono', value: 'mono-scaled' }]
-
-export function ThemeSelector() {
-  const { activeTheme, setActiveTheme } = useThemeConfig()
-
-  return (
-    <div className='flex items-center gap-2'>
-      <Label htmlFor='theme-selector' className='sr-only'>
-        Theme
-      </Label>
-      <Select value={activeTheme} onValueChange={setActiveTheme}>
-        <SelectTrigger id='theme-selector' size='sm' className='justify-start *:data-[slot=select-value]:w-12'>
-          <span className='text-muted-foreground hidden sm:block'>Select a theme:</span>
-          <span className='text-muted-foreground block sm:hidden'>Theme</span>
-          <SelectValue placeholder='Select a theme' />
-        </SelectTrigger>
-        <SelectContent align='end'>
-          <SelectGroup>
-            <SelectLabel>Default</SelectLabel>
-            {DEFAULT_THEMES.map(theme => (
-              <SelectItem key={theme.name} value={theme.value}>
-                {theme.name}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-          <SelectSeparator />
-          <SelectGroup>
-            <SelectLabel>Scaled</SelectLabel>
-            {SCALED_THEMES.map(theme => (
-              <SelectItem key={theme.name} value={theme.value}>
-                {theme.name}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-          <SelectGroup>
-            <SelectLabel>Monospaced</SelectLabel>
-            {MONO_THEMES.map(theme => (
-              <SelectItem key={theme.name} value={theme.value}>
-                {theme.name}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
-  )
-}
-```
-
-### Layout Configuration
-
-1. **Update Root Layout**
-
-Replace your `app/layout.tsx`:
+- putthe <ThemeSelector /> in components/site-header.tsx (above/below <ModeToggle/>)
+- replace the layout
 
 ```tsx
+//app/layout
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
@@ -271,11 +277,10 @@ export default async function RootLayout({
 }
 ```
 
-2. **Add Theme Styles to globals.css**
+- add this in globals.css
 
-Add the following styles to your `app/globals.css`:
+```tsx
 
-```css
 body {
   @apply overscroll-none bg-transparent;
 }
@@ -294,17 +299,16 @@ body {
     --spacing: 0.222222rem;
   }
 
-  [data-slot='card'] {
+  [data-slot="card"] {
     --spacing: 0.16rem;
   }
 
-  [data-slot='select-trigger'],
-  [data-slot='toggle-group-item'] {
+  [data-slot="select-trigger"],
+  [data-slot="toggle-group-item"] {
     --spacing: 0.222222rem;
   }
 }
 
-/* Theme Configurations */
 .theme-default,
 .theme-default-scaled {
   --primary: var(--color-neutral-600);
@@ -377,81 +381,9 @@ body {
     @apply !shadow-none;
   }
 
-  [data-slot='toggle-group'],
-  [data-slot='toggle-group-item'] {
+  [data-slot="toggle-group"],
+  [data-slot="toggle-group-item"] {
     @apply !rounded-none !shadow-none;
   }
 }
 ```
-
-### Integration
-
-1. Add `<ModeToggle />` to your `components/site-header.tsx` (replace the GitHub button)
-2. Add `<ThemeSelector />` to your `components/site-header.tsx` (above or below the ModeToggle)
-
-## Available Themes
-
-### Color Themes
-
-- **Default**: Neutral gray theme
-- **Blue**: Blue accent theme
-- **Green**: Lime green theme
-- **Amber**: Warm amber theme
-
-### Layout Themes
-
-- **Scaled**: Compact layout with smaller spacing and text
-- **Mono**: Monospaced font with no rounded corners or shadows
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-## Project Structure
-
-```
-├── app/
-│   ├── layout.tsx          # Root layout with theme providers
-│   ├── globals.css         # Global styles and theme configurations
-│   └── page.tsx           # Main dashboard page
-├── components/
-│   ├── ui/                # Shadcn UI components
-│   │   └── mode-toggle.tsx # Dark/light mode toggle
-│   ├── theme-provider.tsx  # Next-themes provider wrapper
-│   ├── active-theme.tsx    # Custom theme context provider
-│   ├── theme-selector.tsx  # Theme selection dropdown
-│   └── site-header.tsx     # Header with theme controls
-└── lib/
-    └── utils.ts           # Utility functions
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
-## Acknowledgments
-
-- [Shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
-- [Next.js](https://nextjs.org/) for the React framework
-- [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
-- [Lucide React](https://lucide.dev/) for the icon library
