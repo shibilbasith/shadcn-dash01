@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ActiveThemeProvider } from "@/components/active-theme"
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
+import KBar from "@/components/kbar";
 
 export const metadata: Metadata = {
   title: "Orcish Dashboard",
@@ -37,7 +38,9 @@ export default async function RootLayout({
           enableColorScheme
         >
           <ActiveThemeProvider initialTheme={activeThemeValue}>
-            {children}
+            <KBar>
+              {children}
+            </KBar>
           </ActiveThemeProvider>
         </ThemeProvider>
       </body>
